@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Reminder</string>
+    <string name="action_settings">Settings</string>
+    <string name="description">Описание</string>
+    <string name="date">Дата</string>
+    <string name="time">Время</string>
+    <string name="createTask">Создать напоминание</string>
+    <string name="remove">remove</string>
+</resources>

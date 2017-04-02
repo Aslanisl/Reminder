@@ -39,7 +39,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
     public void onBindViewHolder(TasksArrayAdapter.ViewHolder holder, final int position) {
 
         holder.mDataTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getDay()) + ":"
-                + String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getMonth()) + ":"
+                + String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getMonth()) + 1 + ":"
                 + String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getYear()));
 
         holder.mDescriptionTextView.setText(mTasks.get(position).getDescription());

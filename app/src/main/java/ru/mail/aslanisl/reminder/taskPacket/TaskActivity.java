@@ -146,10 +146,10 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(id, FLAG_UPDATE_CURRENT);
 
         Notification.Builder builder = new Notification.Builder(this)
-                .setContentTitle("Scheduled Notification")
+                .setContentTitle("Необходимо сделать:")
                 .setContentText(content)
                 .setContentIntent(resultPendingIntent)
-                .setSmallIcon(R.drawable.calendar_icon)
+                .setSmallIcon(R.drawable.comment_alert)
                 .setDefaults(Notification.DEFAULT_SOUND)
                 .setAutoCancel(true);
 

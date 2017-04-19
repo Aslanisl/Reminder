@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.main_Toolbar) Toolbar mToolBar;
     @BindView(R.id.tasks_recycleView) RecyclerView mTasksRecycleView;
 
-    ArrayList<TaskExample> mTasksList;
     private TaskIntentJSONSerializer mSerializer;
 
     private TasksArrayAdapter mTasksAdapter;
@@ -103,9 +102,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TASK_REQUEST_CODE){
             if (resultCode == RESULT_OK){
-                mTasksList.add(new TaskExample(data.getLongExtra("date", DEFAULT_VALUE),
+                mTasksAdapter.addNewTask(new TaskExample(data.getLongExtra("date", DEFAULT_VALUE),
                         data.getStringExtra("description")));
-                mTasksAdapter.addTasks(mTasksList);
             }
         }
     }
@@ -135,16 +133,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        saveTasks(mTasksList);
+        saveTasks(mTasksAdapter.getTasks());
     }
 
     public void loadTasks (){
         try {
-            mTasksList = new ArrayList<>();
-            mTasksList = mSerializer.loadTasks();
-            mTasksAdapter.addTasks(mTasksList);
+            mTasksAdapter.addTasks(mSerializer.loadTasks());
         } catch (Exception e){
-            mTasksList = new ArrayList<>();
+            mTasksAdapter.addTasks(new ArrayList<TaskExample>());
             Log.d(TAG, "Failed to load", e);
         }
     }
@@ -160,11 +156,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void removeTask (int position) {
-        mTasksAdapter.removeTask(position);
-        mTasksList.remove(position);
-    }
-
     private void initItemTouchHelper (final RecyclerView recyclerView) {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
@@ -178,9 +169,9 @@ public class MainActivity extends AppCompatActivity {
                 int position = viewHolder.getAdapterPosition();
 
                 if (swipeDir == ItemTouchHelper.LEFT){
-                    removeTask(position);
+                    mTasksAdapter.removeTask(position);
                 } else {
-                    removeTask(position);
+                    mTasksAdapter.removeTask(position);
                 }
             }
 
@@ -196,14 +187,14 @@ public class MainActivity extends AppCompatActivity {
 
                     if(dX > 0){
                         p.setColor(Color.parseColor("#388E3C"));
-                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
+                        RectF background = new RectF((float) itemView.getLeft() + 8, (float) itemView.getTop() - 8, dX,(float) itemView.getBottom());
                         c.drawRect(background,p);
                         icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_edit_white);
                         RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
                         c.drawBitmap(icon,null,icon_dest,p);
                     } else {
                         p.setColor(Color.parseColor("#D32F2F"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(),(float) itemView.getRight(), (float) itemView.getBottom());
+                        RectF background = new RectF((float) itemView.getRight() - 8 + dX, (float) itemView.getTop() - 8,(float) itemView.getRight(), (float) itemView.getBottom());
                         c.drawRect(background,p);
                         icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white);
                         RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);

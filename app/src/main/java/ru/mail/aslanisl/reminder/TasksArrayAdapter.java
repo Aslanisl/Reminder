@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import ru.mail.aslanisl.reminder.taskPacket.TaskExample;
 public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.ViewHolder> {
 
     private ArrayList<TaskExample> mTasks;
+    private ViewHolder mHolder;
 
     public TasksArrayAdapter() {
         mTasks = new ArrayList<>();
@@ -36,21 +38,33 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(TasksArrayAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(TasksArrayAdapter.ViewHolder holder, int position) {
 
-        holder.mDataTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getDay()) + ":"
-                + String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getMonth()) + 1 + ":"
+        mHolder = holder;
+        mHolder.mDataTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getDay()) + ":"
+                + String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getMonth() + 1) + ":"
                 + String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getYear()));
 
-        holder.mDescriptionTextView.setText(mTasks.get(position).getDescription());
+        mHolder.mDescriptionTextView.setText(mTasks.get(position).getDescription());
 
-        holder.mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getHour()) + ":"
+        mHolder.mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getHour()) + ":"
                 + String.format(Locale.ENGLISH, "%02d", mTasks.get(position).getMinute()));
     }
 
     public void addTasks(ArrayList<TaskExample> taskList) {
         mTasks.clear();
         mTasks.addAll(taskList);
+        Collections.sort(mTasks, new Comparator<TaskExample>() {
+            @Override
+            public int compare(TaskExample o1, TaskExample o2) {
+                return String.valueOf(o2.getTaskDateMillis()).compareTo(String.valueOf(o1.getTaskDateMillis()));
+            }
+        });
+        notifyDataSetChanged();
+    }
+
+    public void addNewTask (TaskExample taskExample){
+        mTasks.add(taskExample);
         Collections.sort(mTasks, new Comparator<TaskExample>() {
             @Override
             public int compare(TaskExample o1, TaskExample o2) {
@@ -71,6 +85,10 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         if (mTasks == null)
             return 0;
         return mTasks.size();
+    }
+
+    public ArrayList<TaskExample> getTasks (){
+        return mTasks;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

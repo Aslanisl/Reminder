@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -34,10 +35,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.mail.aslanisl.reminder.taskPacket.SectionsTasksArrayAdapter;
 import ru.mail.aslanisl.reminder.taskPacket.TaskActivity;
 import ru.mail.aslanisl.reminder.taskPacket.TaskExample;
 
@@ -77,10 +80,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolBar);
         mTitleToolBar.setText(TITLE_NAME);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        mTasksRecycleView.setLayoutManager(layoutManager);
-        mTasksAdapter = new TasksArrayAdapter();
-        mTasksRecycleView.setAdapter(mTasksAdapter);
+        initTasksRecyclerView();
 
         //инициализация хелпера для ресайкла. Работа со свайпами айтемов.
         initItemTouchHelper(mTasksRecycleView);
@@ -208,5 +208,29 @@ public class MainActivity extends AppCompatActivity {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void initTasksRecyclerView () {
+        mTasksRecycleView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mTasksRecycleView.setHasFixedSize(true);
+        mTasksRecycleView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+
+        mTasksAdapter = new TasksArrayAdapter();
+
+        List<SectionsTasksArrayAdapter.Section> sections =
+                new ArrayList<SectionsTasksArrayAdapter.Section>();
+
+        sections.add(new SectionsTasksArrayAdapter.Section(0,"Section 1"));
+        sections.add(new SectionsTasksArrayAdapter.Section(5,"Section 2"));
+
+        //Add your adapter to the sectionAdapter
+        SectionsTasksArrayAdapter.Section[] dummy = new SectionsTasksArrayAdapter.Section[sections.size()];
+        SectionsTasksArrayAdapter mSectionedAdapter = new
+                SectionsTasksArrayAdapter(this,R.layout.sections, R.id.section_text, mTasksAdapter);
+        mSectionedAdapter.setSections(sections.toArray(dummy));
+
+        //Apply this adapter to the RecyclerView
+        mTasksRecycleView.setAdapter(mSectionedAdapter);
+
     }
 }

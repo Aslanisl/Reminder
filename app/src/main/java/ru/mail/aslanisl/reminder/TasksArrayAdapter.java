@@ -75,9 +75,10 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
     }
 
     public void removeTask (int position){
-        mTasks.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, mTasks.size());
+        if (position < getItemCount()) {
+            mTasks.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
     @Override

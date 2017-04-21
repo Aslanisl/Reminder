@@ -1,4 +1,4 @@
-package ru.mail.aslanisl.reminder.taskPacket;
+package ru.mail.aslanisl.reminder.ui.fragment;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

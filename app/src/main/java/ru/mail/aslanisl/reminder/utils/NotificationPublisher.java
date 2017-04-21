@@ -1,4 +1,4 @@
-package ru.mail.aslanisl.reminder.taskPacket;
+package ru.mail.aslanisl.reminder.utils;
 
 import android.app.Notification;
 import android.app.NotificationManager;

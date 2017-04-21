@@ -1,4 +1,4 @@
-package ru.mail.aslanisl.reminder;
+package ru.mail.aslanisl.reminder.utils;
 
 import android.content.Context;
 
@@ -15,8 +15,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-
-import ru.mail.aslanisl.reminder.taskPacket.TaskExample;
 
 public class TaskIntentJSONSerializer {
     private Context mContext;

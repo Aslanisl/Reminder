@@ -14,7 +14,7 @@
         android:theme="@style/Theme.Design.NoActionBar">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -25,11 +25,11 @@
         </activity>
 
         <activity
-            android:name=".taskPacket.TaskActivity"
+            android:name=".ui.activity.TaskActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
-        <receiver android:name=".taskPacket.NotificationPublisher" />
+        <receiver android:name=".utils.NotificationPublisher" />
 
     </application>
 

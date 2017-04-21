@@ -1,4 +1,4 @@
-package ru.mail.aslanisl.reminder.taskPacket;
+package ru.mail.aslanisl.reminder.ui.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

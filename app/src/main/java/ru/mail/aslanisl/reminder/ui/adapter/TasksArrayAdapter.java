@@ -1,16 +1,10 @@
-package ru.mail.aslanisl.reminder;
+package ru.mail.aslanisl.reminder.ui.adapter;
 
-import android.content.Context;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +13,8 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ru.mail.aslanisl.reminder.taskPacket.TaskExample;
+import ru.mail.aslanisl.reminder.R;
+import ru.mail.aslanisl.reminder.utils.TaskExample;
 
 
 public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.ViewHolder> {

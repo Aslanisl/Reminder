@@ -1,4 +1,4 @@
-package ru.mail.aslanisl.reminder.taskPacket;
+package ru.mail.aslanisl.reminder.utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;

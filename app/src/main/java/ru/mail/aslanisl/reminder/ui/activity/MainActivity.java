@@ -1,4 +1,4 @@
-package ru.mail.aslanisl.reminder;
+package ru.mail.aslanisl.reminder.ui.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,38 +16,21 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ru.mail.aslanisl.reminder.taskPacket.SectionsTasksArrayAdapter;
-import ru.mail.aslanisl.reminder.taskPacket.TaskActivity;
-import ru.mail.aslanisl.reminder.taskPacket.TaskExample;
-
-import static android.R.attr.direction;
-import static ru.mail.aslanisl.reminder.R.id.cancel_action;
-import static ru.mail.aslanisl.reminder.R.id.fab;
-import static ru.mail.aslanisl.reminder.R.id.task_create_button;
+import ru.mail.aslanisl.reminder.R;
+import ru.mail.aslanisl.reminder.ui.adapter.SectionsTasksArrayAdapter;
+import ru.mail.aslanisl.reminder.utils.TaskIntentJSONSerializer;
+import ru.mail.aslanisl.reminder.ui.adapter.TasksArrayAdapter;
+import ru.mail.aslanisl.reminder.utils.TaskExample;
 
 public class MainActivity extends AppCompatActivity {
 

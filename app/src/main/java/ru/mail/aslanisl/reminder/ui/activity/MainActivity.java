@@ -27,7 +27,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.mail.aslanisl.reminder.R;
-import ru.mail.aslanisl.reminder.ui.adapter.SectionsTasksArrayAdapter;
 import ru.mail.aslanisl.reminder.utils.TaskIntentJSONSerializer;
 import ru.mail.aslanisl.reminder.ui.adapter.TasksArrayAdapter;
 import ru.mail.aslanisl.reminder.utils.TaskExample;
@@ -63,7 +62,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolBar);
         mTitleToolBar.setText(TITLE_NAME);
 
-        initTasksRecyclerView();
+        mTasksRecycleView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mTasksRecycleView.setHasFixedSize(true);
+        mTasksRecycleView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+
+        mTasksAdapter = new TasksArrayAdapter();
+
+        //Apply this adapter to the RecyclerView
+        mTasksRecycleView.setAdapter(mTasksAdapter);
 
         //инициализация хелпера для ресайкла. Работа со свайпами айтемов.
         initItemTouchHelper(mTasksRecycleView);
@@ -151,10 +157,12 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
 
-                if (swipeDir == ItemTouchHelper.LEFT){
-                    mTasksAdapter.removeTask(position);
-                } else {
-                    mTasksAdapter.removeTask(position);
+                if (viewHolder instanceof TasksArrayAdapter.ViewHolder) {
+                    switch (swipeDir){
+                        case ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT:
+                            mTasksAdapter.removeTask(position);
+                            break;
+                    }
                 }
             }
 
@@ -191,29 +199,5 @@ public class MainActivity extends AppCompatActivity {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-    }
-
-    private void initTasksRecyclerView () {
-        mTasksRecycleView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        mTasksRecycleView.setHasFixedSize(true);
-        mTasksRecycleView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-
-        mTasksAdapter = new TasksArrayAdapter();
-
-        List<SectionsTasksArrayAdapter.Section> sections =
-                new ArrayList<SectionsTasksArrayAdapter.Section>();
-
-        sections.add(new SectionsTasksArrayAdapter.Section(0,"Section 1"));
-        sections.add(new SectionsTasksArrayAdapter.Section(5,"Section 2"));
-
-        //Add your adapter to the sectionAdapter
-        SectionsTasksArrayAdapter.Section[] dummy = new SectionsTasksArrayAdapter.Section[sections.size()];
-        SectionsTasksArrayAdapter mSectionedAdapter = new
-                SectionsTasksArrayAdapter(this,R.layout.sections, R.id.section_text, mTasksAdapter);
-        mSectionedAdapter.setSections(sections.toArray(dummy));
-
-        //Apply this adapter to the RecyclerView
-        mTasksRecycleView.setAdapter(mSectionedAdapter);
-
     }
 }

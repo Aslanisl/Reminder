@@ -41,7 +41,7 @@
         android:layout_margin="8dp">
 
         <EditText
-            android:id="@+id/description_editText"
+            android:id="@+id/description_task_editText"
             style="@style/MyEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

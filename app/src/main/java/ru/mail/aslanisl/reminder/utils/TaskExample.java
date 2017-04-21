@@ -10,6 +10,10 @@ public class TaskExample implements Serializable{
 
     public static final String JSON_TIME = "time";
     public static final String JSON_DESCRIPTION = "description";
+    public static final String JSON_TODAY_DAY = "todayDay";
+    public static final String JSON_TODAY_MONTH = "todayMonth";
+    public static final String JSON_TODAY_YEAR = "todayYear";
+    public static final String JSON_TODAY_MULLIS = "todayMullis";
 
     long mTaskDateMillis;
     String mDescription;

@@ -36,7 +36,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.time_task_linearLayout) LinearLayout mTimeLayout;
     @BindView(R.id.time_task_textView) TextView mTimeTextView;
     @BindView(R.id.task_create_button) Button mTaskCreateButton;
-    @BindView(R.id.description_editText) EditText mDescriptionEditText;
+    @BindView(R.id.description_task_editText) EditText mDescriptionEditText;
 
     private DatePickerFragment mNewDateFragment;
     private TimePickerFragment mNewTimeFragment;

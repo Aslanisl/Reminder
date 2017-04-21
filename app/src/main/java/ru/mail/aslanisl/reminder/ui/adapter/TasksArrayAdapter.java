@@ -1,5 +1,6 @@
 package ru.mail.aslanisl.reminder.ui.adapter;
 
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -26,7 +27,6 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
     private static final int SECTION_TYPE = 0;
     private static final int TASK_TYPE = 1;
     private static final String SECTION_SOON = "Скоро";
-    private static final String SECTION_TOMORROW = "Завтра";
     private static final String SECTION_TODAY = "Сегодня";
     private static final String SECTION_DONE= "Завершенные";
 
@@ -40,25 +40,23 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     @Override
     public TasksArrayAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        boolean taskType = false;
 
         if (viewType == TASK_TYPE){
             View taskView = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
-            taskType = true;
-            return new ViewHolder(taskView, taskType);
+            return new ViewHolder(taskView);
         } else {
             View sectionView = LayoutInflater.from(parent.getContext()).inflate(R.layout.sections, parent, false);
-            return new ViewHolder(sectionView, taskType);
+            return new ViewHolder(sectionView);
         }
     }
 
     @Override
     public void onBindViewHolder(TasksArrayAdapter.ViewHolder holder, int position) {
 
-        if (isSectionHeaderPosition(position)){
+        if (isSectionHeaderPosition(holder.getAdapterPosition())){
             holder.mSectionTextView.setText(String.valueOf(mSections.get(position).getTitle()));
         } else {
-            int taskPosition =  sectionedPositionToPosition(position);
+            int taskPosition =  sectionedPositionToPosition(holder.getAdapterPosition());
 
             holder.mDataTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getDay()) + ":"
                     + String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getMonth() + 1) + ":"
@@ -101,8 +99,9 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     public void removeTask (int position){
         if (position < getItemCount()) {
-            mTasks.remove(position);
-            notifyItemRemoved(position);
+            mTasks.remove(sectionedPositionToPosition(position));
+            sortingTasksToSections(mTasks);
+            notifyDataSetChanged();
         }
     }
 
@@ -157,8 +156,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     @Override
     public int getItemCount() {
-        if (mTasks == null)
-            return 0;
+        if (mTasks == null) return 0;
         return mTasks.size() + mSections.size();
     }
 
@@ -180,19 +178,15 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView mDataTextView;
-        TextView mTimeTextView;
-        TextView mDescriptionTextView;
-        TextView mSectionTextView;
+        @Nullable @BindView(R.id.data_textView) TextView mDataTextView;
+        @Nullable @BindView(R.id.time_textView) TextView mTimeTextView;
+        @Nullable @BindView(R.id.description_textView) TextView mDescriptionTextView;
+        @Nullable @BindView(R.id.section_text) TextView mSectionTextView;
 
-        public ViewHolder(View itemView, boolean taskType) {
+        public ViewHolder(View itemView) {
             super(itemView);
 
-            if (taskType){
-                mDataTextView = (TextView) itemView.findViewById(R.id.data_textView);
-                mTimeTextView = (TextView) itemView.findViewById(R.id.time_textView);
-                mDescriptionTextView = (TextView) itemView.findViewById(R.id.description_textView);
-            } else mSectionTextView = (TextView) itemView.findViewById(R.id.section_text);
+            ButterKnife.bind(this, itemView);
         }
     }
 
@@ -209,28 +203,6 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         public String getTitle() {
             return mTitle;
         }
-    }
-
-    public void setSections(Section[] sections) {
-        mSections.clear();
-
-        Arrays.sort(sections, new Comparator<Section>() {
-            @Override
-            public int compare(Section o, Section o1) {
-                return (o.mFirstPosition == o1.mFirstPosition)
-                        ? 0
-                        : ((o.mFirstPosition < o1.mFirstPosition) ? -1 : 1);
-            }
-        });
-
-        int offset = 0; // offset positions for the headers we're adding
-        for (Section section : sections) {
-            section.mSectionedPosition = section.mFirstPosition + offset;
-            mSections.append(section.mSectionedPosition, section);
-            ++offset;
-        }
-
-        notifyDataSetChanged();
     }
 
     public int positionToSectionedPosition(int position) {

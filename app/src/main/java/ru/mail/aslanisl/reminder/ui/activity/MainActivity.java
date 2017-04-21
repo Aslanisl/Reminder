@@ -157,12 +157,8 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
 
-                if (viewHolder instanceof TasksArrayAdapter.ViewHolder) {
-                    switch (swipeDir){
-                        case ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT:
-                            mTasksAdapter.removeTask(position);
-                            break;
-                    }
+                if (swipeDir == ItemTouchHelper.LEFT || swipeDir == ItemTouchHelper.RIGHT){
+                    mTasksAdapter.removeTask(position);
                 }
             }
 

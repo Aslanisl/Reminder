@@ -4,6 +4,7 @@
     <string name="description">Описание</string>
     <string name="date">Дата</string>
     <string name="time">Время</string>
-    <string name="createTask">Создать напоминание</string>
+    <string name="create_task">Создать напоминание</string>
     <string name="remove">remove</string>
+    <string name="dialog_task">Что сделать?</string>
 </resources>

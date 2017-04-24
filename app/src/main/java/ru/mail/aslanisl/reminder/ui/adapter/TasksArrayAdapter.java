@@ -1,15 +1,21 @@
 package ru.mail.aslanisl.reminder.ui.adapter;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,10 +38,12 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     private ArrayList<TaskExample> mTasks;
     private SparseArray<Section> mSections;
+    private Context mContext;
 
-    public TasksArrayAdapter() {
+    public TasksArrayAdapter(Context context) {
         mTasks = new ArrayList<>();
         mSections = new SparseArray<>();
+        mContext = context;
     }
 
     @Override
@@ -56,7 +64,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         if (isSectionHeaderPosition(holder.getAdapterPosition())){
             holder.mSectionTextView.setText(String.valueOf(mSections.get(position).getTitle()));
         } else {
-            int taskPosition =  sectionedPositionToPosition(holder.getAdapterPosition());
+            final int taskPosition =  sectionedPositionToPosition(holder.getAdapterPosition());
 
             holder.mDataTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getDay()) + ":"
                     + String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getMonth() + 1) + ":"
@@ -66,6 +74,14 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
             holder.mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getHour()) + ":"
                     + String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getMinute()));
+
+            holder.mTaskContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    showItemDeleteEditDialog(taskPosition);
+                    return true;
+                }
+            });
         }
     }
 
@@ -105,6 +121,12 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         }
     }
 
+    public void editTask (int position){
+        if (position < getItemCount()){
+
+        }
+    }
+
     public void sortingTasksToSections (ArrayList<TaskExample> tasks){
 
         int soonTasks = 0;
@@ -116,6 +138,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
         Calendar calendar = Calendar.getInstance();
 
+        //Sorting tasks by data for soon, today and done.
         for (TaskExample task : tasks){
             if (task.getTaskDateMillis() < calendar.getTimeInMillis()){
                 doneTasks++;
@@ -135,6 +158,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         List<Section> sections = new ArrayList<Section>();
         sections.clear();
 
+        //Create sections for section header's.
         if (isHasSoonTask)
             sections.add(new Section(0, SECTION_SOON));
 
@@ -181,6 +205,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         @Nullable @BindView(R.id.data_textView) TextView mDataTextView;
         @Nullable @BindView(R.id.time_textView) TextView mTimeTextView;
         @Nullable @BindView(R.id.description_textView) TextView mDescriptionTextView;
+        @Nullable @BindView(R.id.task_item_container) RelativeLayout mTaskContainer;
         @Nullable @BindView(R.id.section_text) TextView mSectionTextView;
 
         public ViewHolder(View itemView) {
@@ -188,6 +213,27 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public void showItemDeleteEditDialog (final int position) {
+        new MaterialDialog.Builder(mContext)
+                .title(R.string.dialog_task)
+                .positiveText("Изменить")
+                .negativeText("Удалить")
+                .buttonsGravity(GravityEnum.CENTER)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        removeTask(position);
+                    }
+                })
+                .show();
     }
 
     public static class Section {

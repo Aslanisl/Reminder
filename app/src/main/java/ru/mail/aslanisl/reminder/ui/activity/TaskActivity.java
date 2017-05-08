@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.mail.aslanisl.reminder.model.TaskExample;
 import ru.mail.aslanisl.reminder.ui.fragment.DatePickerFragment;
 import ru.mail.aslanisl.reminder.utils.NotificationPublisher;
 import ru.mail.aslanisl.reminder.ui.fragment.TimePickerFragment;
@@ -61,7 +62,12 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         mNewDateFragment = new DatePickerFragment(mDateTextView);
         mNewTimeFragment = new TimePickerFragment(mTimeTextView);
 
-        setCurrentDateTime();
+        Intent intent = getIntent();
+        if (intent == null) {
+            setCurrentDateTime();
+        } else {
+            setTaskForEdit(intent);
+        }
     }
 
     @Override
@@ -91,6 +97,21 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mHourOfDay) + ":" + String.format(Locale.ENGLISH, "%02d", mMinute));
     }
 
+    private void setTaskForEdit(Intent intent){
+        if (intent.getSerializableExtra("task") != null) {
+            TaskExample taskExample = (TaskExample) intent.getSerializableExtra("task");
+            mYear = taskExample.getYear();
+            mMonth = taskExample.getMonth();
+            mDayOfMonth = taskExample.getDay();
+            mHourOfDay = taskExample.getHour();
+            mMinute = taskExample.getMinute();
+
+            mDescriptionEditText.setText(taskExample.getDescription());
+            mDateTextView.setText(String.format(Locale.ENGLISH, "%02d", mDayOfMonth) + ":" + String.format(Locale.ENGLISH, "%02d", mMonth + 1) + ":" + String.valueOf(mYear));
+            mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mHourOfDay) + ":" + String.format(Locale.ENGLISH, "%02d", mMinute));
+        }
+    }
+
     private void createTask () {
 
         //Чтоты в ситуации, когда не выбрано время пользователем, было текущее время
@@ -113,6 +134,25 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         returnIntent.putExtra("description", mDescriptionEditText.getText().toString());
         setResult(RESULT_OK, returnIntent);
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+
+        Calendar c = Calendar.getInstance();
+
+        c.set(mYear, mMonth, mDayOfMonth, mHourOfDay, mMinute);
+        mTaskTimeMillis = c.getTimeInMillis();
+
+        scheduleNotification(getNotification(mDescriptionEditText.getText().toString()), mTaskTimeMillis);
+
+        returnIntent.putExtra("date", mTaskTimeMillis);
+        returnIntent.putExtra("description", mDescriptionEditText.getText().toString());
+        setResult(RESULT_CANCELED, returnIntent);
+        finish();
+
+        super.onBackPressed();
     }
 
     private void scheduleNotification(Notification notification, long taskTime) {

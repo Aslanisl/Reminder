@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,7 +18,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.mail.aslanisl.reminder.R;
-import ru.mail.aslanisl.reminder.utils.TaskExample;
+import ru.mail.aslanisl.reminder.model.TaskExample;
 
 
 public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.ViewHolder> {
@@ -79,7 +78,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
             }
         });
 
-        sortingTasksToSections(mTasks);
+        sortingTasksToSections();
 
         notifyDataSetChanged();
     }
@@ -92,20 +91,13 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
         mTasks.add(newTaskPosition, taskExample);
 
-        sortingTasksToSections(mTasks);
+        sortingTasksToSections();
 
         notifyDataSetChanged();
     }
 
-    public void removeTask (int position){
-        if (position < getItemCount()) {
-            mTasks.remove(sectionedPositionToPosition(position));
-            sortingTasksToSections(mTasks);
-            notifyDataSetChanged();
-        }
-    }
 
-    public void sortingTasksToSections (ArrayList<TaskExample> tasks){
+    public void sortingTasksToSections (){
 
         int soonTasks = 0;
         boolean isHasSoonTask = false;
@@ -116,7 +108,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
         Calendar calendar = Calendar.getInstance();
 
-        for (TaskExample task : tasks){
+        for (TaskExample task : mTasks){
             if (task.getTaskDateMillis() < calendar.getTimeInMillis()){
                 doneTasks++;
                 isHasDoneTask = true;
@@ -174,6 +166,10 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     public ArrayList<TaskExample> getTasks (){
         return mTasks;
+    }
+
+    public TaskExample getCurrentTask(int position){
+        return mTasks.get(sectionedPositionToPosition(position));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -16,6 +16,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
+import ru.mail.aslanisl.reminder.model.TaskExample;
+
 public class TaskIntentJSONSerializer {
     private Context mContext;
     private String mFilename;

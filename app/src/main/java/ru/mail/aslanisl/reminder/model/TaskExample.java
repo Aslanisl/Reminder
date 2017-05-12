@@ -1,4 +1,4 @@
-package ru.mail.aslanisl.reminder.utils;
+package ru.mail.aslanisl.reminder.model;
 
 import org.json.JSONException;
 import org.json.JSONObject;

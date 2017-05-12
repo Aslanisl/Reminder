@@ -26,7 +26,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnItemLongClick;
 import ru.mail.aslanisl.reminder.R;
 import ru.mail.aslanisl.reminder.utils.TaskIntentJSONSerializer;
 import ru.mail.aslanisl.reminder.ui.adapter.TasksArrayAdapter;
@@ -67,14 +66,13 @@ public class MainActivity extends AppCompatActivity {
         mTasksRecycleView.setHasFixedSize(true);
         mTasksRecycleView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        mTasksAdapter = new TasksArrayAdapter(this);
+        mTasksAdapter = new TasksArrayAdapter();
 
         //Apply this adapter to the RecyclerView
         mTasksRecycleView.setAdapter(mTasksAdapter);
 
-        //Initialization touch helper for recycler view. Working with LEFT and RIGHT swipes.
-        //Close for now.
-        //initItemTouchHelper(mTasksRecycleView);
+        //инициализация хелпера для ресайкла. Работа со свайпами айтемов.
+        initItemTouchHelper(mTasksRecycleView);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

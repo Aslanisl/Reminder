@@ -1,6 +1,9 @@
 package ru.mail.aslanisl.reminder.ui.adapter;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -19,7 +22,8 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.mail.aslanisl.reminder.R;
-import ru.mail.aslanisl.reminder.utils.TaskExample;
+import ru.mail.aslanisl.reminder.model.TaskExample;
+import ru.mail.aslanisl.reminder.ui.fragment.ActionTaskFragment;
 
 
 public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.ViewHolder> {
@@ -30,12 +34,14 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
     private static final String SECTION_TODAY = "Сегодня";
     private static final String SECTION_DONE= "Завершенные";
 
-    private ArrayList<TaskExample> mTasks;
-    private SparseArray<Section> mSections;
+    private ArrayList<TaskExample> mTasks = new ArrayList<>();
+    private SparseArray<Section> mSections = new SparseArray<>();
+    private Context mContext;
+    private FragmentManager mFragmentManager;
 
-    public TasksArrayAdapter() {
-        mTasks = new ArrayList<>();
-        mSections = new SparseArray<>();
+    public TasksArrayAdapter(Context context, FragmentManager fragmentManager) {
+        mContext = context;
+        mFragmentManager = fragmentManager;
     }
 
     @Override
@@ -56,7 +62,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         if (isSectionHeaderPosition(holder.getAdapterPosition())){
             holder.mSectionTextView.setText(String.valueOf(mSections.get(position).getTitle()));
         } else {
-            int taskPosition =  sectionedPositionToPosition(holder.getAdapterPosition());
+            final int taskPosition =  sectionedPositionToPosition(holder.getAdapterPosition());
 
             holder.mDataTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getDay()) + ":"
                     + String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getMonth() + 1) + ":"
@@ -66,6 +72,14 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
             holder.mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getHour()) + ":"
                     + String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getMinute()));
+
+            holder.mMainContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    ActionTaskFragment.newInstance(taskPosition).show(mFragmentManager, "ActionTask");
+                    return true;
+                }
+            });
         }
     }
 
@@ -86,6 +100,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     public void addNewTask (TaskExample taskExample){
         int newTaskPosition = 0;
+
         for (TaskExample task : mTasks){
             if (task.getTaskDateMillis() > taskExample.getTaskDateMillis()) newTaskPosition++;
         }
@@ -100,6 +115,14 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
     public void removeTask (int position){
         if (position < getItemCount()) {
             mTasks.remove(sectionedPositionToPosition(position));
+            sortingTasksToSections(mTasks);
+            notifyDataSetChanged();
+        }
+    }
+
+    public void editTask (int position, TaskExample taskExample){
+        if (position < getItemCount()) {
+            mTasks.set(position, taskExample);
             sortingTasksToSections(mTasks);
             notifyDataSetChanged();
         }
@@ -178,6 +201,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        @Nullable @BindView(R.id.task_item_container) CardView mMainContainer;
         @Nullable @BindView(R.id.data_textView) TextView mDataTextView;
         @Nullable @BindView(R.id.time_textView) TextView mTimeTextView;
         @Nullable @BindView(R.id.description_textView) TextView mDescriptionTextView;

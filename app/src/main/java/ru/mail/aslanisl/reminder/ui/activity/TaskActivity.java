@@ -47,6 +47,8 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
     private int mDayOfMonth;
     private int mHourOfDay;
     private int mMinute;
+    private boolean mIsEditTask = false;
+    private int mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +111,9 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
             mDescriptionEditText.setText(taskExample.getDescription());
             mDateTextView.setText(String.format(Locale.ENGLISH, "%02d", mDayOfMonth) + ":" + String.format(Locale.ENGLISH, "%02d", mMonth + 1) + ":" + String.valueOf(mYear));
             mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mHourOfDay) + ":" + String.format(Locale.ENGLISH, "%02d", mMinute));
+
+            mPosition = intent.getIntExtra("position", 0);
+            mIsEditTask = true;
         }
     }
 
@@ -130,6 +135,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
         scheduleNotification(getNotification(mDescriptionEditText.getText().toString()), mTaskTimeMillis);
 
+        returnIntent.putExtra("edit", mIsEditTask);
         returnIntent.putExtra("date", mTaskTimeMillis);
         returnIntent.putExtra("description", mDescriptionEditText.getText().toString());
         setResult(RESULT_OK, returnIntent);
@@ -147,6 +153,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
         scheduleNotification(getNotification(mDescriptionEditText.getText().toString()), mTaskTimeMillis);
 
+        returnIntent.putExtra("edit", mIsEditTask);
         returnIntent.putExtra("date", mTaskTimeMillis);
         returnIntent.putExtra("description", mDescriptionEditText.getText().toString());
         setResult(RESULT_CANCELED, returnIntent);

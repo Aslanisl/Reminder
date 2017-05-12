@@ -21,15 +21,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.mail.aslanisl.reminder.R;
+import ru.mail.aslanisl.reminder.model.TaskExample;
 import ru.mail.aslanisl.reminder.utils.TaskIntentJSONSerializer;
 import ru.mail.aslanisl.reminder.ui.adapter.TasksArrayAdapter;
-import ru.mail.aslanisl.reminder.utils.TaskExample;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,15 +64,12 @@ public class MainActivity extends AppCompatActivity {
 
         mTasksRecycleView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         mTasksRecycleView.setHasFixedSize(true);
-        mTasksRecycleView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        mTasksAdapter = new TasksArrayAdapter();
+        mTasksAdapter = new TasksArrayAdapter(getBaseContext(), getSupportFragmentManager());
 
         //Apply this adapter to the RecyclerView
         mTasksRecycleView.setAdapter(mTasksAdapter);
 
-        //инициализация хелпера для ресайкла. Работа со свайпами айтемов.
-        initItemTouchHelper(mTasksRecycleView);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +88,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TASK_REQUEST_CODE){
             if (resultCode == RESULT_OK){
-                mTasksAdapter.addNewTask(new TaskExample(data.getLongExtra("date", DEFAULT_VALUE),
+                boolean isEditTask = data.getBooleanExtra("edit", false);
+                if (isEditTask){
+                    TaskExample taskExample = new TaskExample(data.getLongExtra("date", DEFAULT_VALUE),
+                            data.getStringExtra("description"));
+                    int position = data.getIntExtra("position", 0);
+                    mTasksAdapter.editTask(position, taskExample);
+                } else mTasksAdapter.addNewTask(new TaskExample(data.getLongExtra("date", DEFAULT_VALUE),
                         data.getStringExtra("description")));
             }
         }
@@ -145,6 +148,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void editTask(int position){
+        Intent intent = new Intent(this, TaskActivity.class);
+        intent.putExtra("task", mTasksAdapter.getTasks().get(position));
+        intent.putExtra("position", position);
+        startActivityForResult(intent, TASK_REQUEST_CODE);
+    }
+
+    public void deleteTask(int position){
+        mTasksAdapter.removeTask(position);
+    }
+
+    //Добавить обрабоку свайпов для ресайклера
     private void initItemTouchHelper (final RecyclerView recyclerView) {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 

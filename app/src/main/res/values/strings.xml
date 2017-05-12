@@ -7,4 +7,6 @@
     <string name="create_task">Создать напоминание</string>
     <string name="remove">remove</string>
     <string name="dialog_task">Что сделать?</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Редактировать</string>
 </resources>

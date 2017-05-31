@@ -148,9 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeTask (int position){
         if (position < mTasksAdapter.getItemCount()) {
-            mTasksAdapter.getTasks().remove(mTasksAdapter.getCurrentTask(position));
-            mTasksAdapter.sortingTasksToSections();
-            mTasksAdapter.notifyDataSetChanged();
+            mTasksAdapter.notifyItemRemoved(position);
         }
     }
 
@@ -179,29 +177,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
 
-//                Bitmap icon;
-//                if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-//
-//                    View itemView = viewHolder.itemView;
-//                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
-//                    float width = height / 3;
-//
-//                    if(dX > 0){
-//                        p.setColor(Color.parseColor("#388E3C"));
-//                        RectF background = new RectF((float) itemView.getLeft() + 8, (float) itemView.getTop() - 8, dX,(float) itemView.getBottom());
-//                        c.drawRect(background,p);
-//                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_edit_white);
-//                        RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
-//                        c.drawBitmap(icon,null,icon_dest,p);
-//                    } else {
-//                        p.setColor(Color.parseColor("#D32F2F"));
-//                        RectF background = new RectF((float) itemView.getRight() - 8 + dX, (float) itemView.getTop() - 8,(float) itemView.getRight(), (float) itemView.getBottom());
-//                        c.drawRect(background,p);
-//                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white);
-//                        RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
-//                        c.drawBitmap(icon,null,icon_dest,p);
-//                    }
-//                }
+                Bitmap icon;
+                if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
+
+                    View itemView = viewHolder.itemView;
+                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
+                    float width = height / 3;
+
+                    if(dX > 0){
+                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_account_edit_black_24dp);
+                        RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
+                        c.drawBitmap(icon,null,icon_dest, p);
+                    } else {
+                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_black_24dp);
+                        RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
+                        c.drawBitmap(icon,null,icon_dest,null);
+                    }
+                }
 
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }

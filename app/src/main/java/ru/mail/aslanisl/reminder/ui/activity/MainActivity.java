@@ -71,17 +71,14 @@ public class MainActivity extends AppCompatActivity {
         mTasksRecycleView.setAdapter(mTasksAdapter);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent;
-                intent = new Intent(MainActivity.this, TaskActivity.class);
-                startActivityForResult(intent, TASK_REQUEST_CODE);
-            }
-        });
-
         loadTasks();
+    }
+
+    @OnClick(R.id.fab)
+    void createNewTask(){
+        Intent intent;
+        intent = new Intent(MainActivity.this, TaskActivity.class);
+        startActivityForResult(intent, TASK_REQUEST_CODE);
     }
 
     @Override
@@ -150,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void editTask(int position){
         Intent intent = new Intent(this, TaskActivity.class);
-        intent.putExtra("task", mTasksAdapter.getTasks().get(position));
+        intent.putExtra("task", mTasksAdapter.getTasks().get(mTasksAdapter.sectionedPositionToPosition(position)));
         intent.putExtra("position", position);
         startActivityForResult(intent, TASK_REQUEST_CODE);
     }
@@ -172,8 +169,13 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
 
-                if (swipeDir == ItemTouchHelper.LEFT || swipeDir == ItemTouchHelper.RIGHT){
-                    mTasksAdapter.removeTask(position);
+                switch (swipeDir){
+                    case ItemTouchHelper.RIGHT:
+                        editTask(position);
+                        break;
+                    case ItemTouchHelper.LEFT:
+                        removeTask(position);
+                        break;
                 }
             }
 
@@ -188,19 +190,13 @@ public class MainActivity extends AppCompatActivity {
                     float width = height / 3;
 
                     if(dX > 0){
-                        p.setColor(Color.parseColor("#388E3C"));
-                        RectF background = new RectF((float) itemView.getLeft() + 8, (float) itemView.getTop() - 8, dX,(float) itemView.getBottom());
-                        c.drawRect(background,p);
-                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_edit_white);
+                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_account_edit_black_24dp);
                         RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
+                        c.drawBitmap(icon,null,icon_dest, p);
                     } else {
-                        p.setColor(Color.parseColor("#D32F2F"));
-                        RectF background = new RectF((float) itemView.getRight() - 8 + dX, (float) itemView.getTop() - 8,(float) itemView.getRight(), (float) itemView.getBottom());
-                        c.drawRect(background,p);
-                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white);
+                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_black_24dp);
                         RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
+                        c.drawBitmap(icon,null,icon_dest,null);
                     }
                 }
 

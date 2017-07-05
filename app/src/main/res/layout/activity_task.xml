@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,129 +8,119 @@
     tools:context="ru.mail.aslanisl.reminder.ui.activity.TaskActivity">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/task_appBarLayout"
+        android:id="@+id/task_activity_layout_app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/task_tool_bar"
+            android:id="@+id/task_activity_tool_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <TextView
-                android:id="@+id/task_title_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="24sp"
-                tools:text="Title" />
-
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/description_text_layout"
+        android:id="@+id/task_activity_description_text_layout"
         style="@style/HintText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/task_appBarLayout"
+        android:layout_below="@id/task_activity_layout_app_bar_layout"
         android:layout_margin="8dp">
 
         <EditText
-            android:id="@+id/description_task_editText"
+            android:id="@+id/task_activity_description_task_editText"
             style="@style/MyEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ems="2000"
             android:hint="@string/description"
-            android:inputType="text"
-            android:ems="2000"/>
+            android:inputType="text"/>
 
     </android.support.design.widget.TextInputLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="100dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp">
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:background="@drawable/background_task_item"
-            android:id="@+id/data_task_linearLayout"
+            android:id="@+id/task_activity_data_task_layout"
             android:layout_width="0dp"
-            android:layout_weight="1.5"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginRight="25dp"
-            android:layout_marginEnd="25dp">
+            android:layout_weight="1.5"
+            android:background="@drawable/background_task_item"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/calendar_icon" />
+                android:src="@drawable/calendar_icon"/>
 
             <TextView
-                android:id="@+id/data_task_textView"
+                android:id="@+id/task_activity_data_task_text"
                 style="@style/MyTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/date" />
+                android:hint="@string/date"/>
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/time_task_linearLayout"
-            android:background="@drawable/background_task_item"
+            android:id="@+id/task_activity_time_task_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:layout_weight="1"
+            android:layout_marginEnd="25dp"
             android:layout_marginRight="25dp"
-            android:layout_marginEnd="25dp">
+            android:layout_weight="1"
+            android:background="@drawable/background_task_item"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <ImageView
                 android:layout_width="35dp"
                 android:layout_height="50dp"
-                android:src="@android:drawable/ic_lock_idle_alarm" />
+                android:src="@android:drawable/ic_lock_idle_alarm"/>
 
             <TextView
-                android:id="@+id/time_task_textView"
+                android:id="@+id/task_activity_time_task_text"
                 style="@style/MyTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="@string/time" />
+                android:hint="@string/time"/>
 
         </LinearLayout>
 
     </LinearLayout>
 
-
     <Button
-        android:id="@+id/task_create_button"
-        android:padding="8dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:id="@+id/task_activity_task_create_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/background_task_item"
+        android:padding="8dp"
         android:text="@string/create_task"
         android:textAllCaps="false"
-        android:textSize="20sp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/background_task_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:textSize="20sp">
 
     </Button>
 

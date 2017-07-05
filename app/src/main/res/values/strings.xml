@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Reminder</string>
     <string name="action_settings">Settings</string>
+    <string name="main_title">Напоминалка</string>
     <string name="description">Описание</string>
     <string name="date">Дата</string>
     <string name="time">Время</string>
@@ -9,4 +10,13 @@
     <string name="dialog_task">Что сделать?</string>
     <string name="delete">Удалить</string>
     <string name="edit">Редактировать</string>
+    <string name="you_havent_task">У вас пока нет задач</string>
+
+    <string name="soon">Скоро</string>
+    <string name="today">Сегодня</string>
+    <string name="done">Завершенные</string>
+
+    <string name="new_task_title">Новое напоминание</string>
+    <string name="edit_task_title">Редактировать напоминание</string>
+
 </resources>

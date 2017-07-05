@@ -8,16 +8,12 @@ import java.util.Calendar;
 
 public class TaskExample implements Serializable{
 
-    public static final String JSON_TIME = "time";
-    public static final String JSON_DESCRIPTION = "description";
-    public static final String JSON_TODAY_DAY = "todayDay";
-    public static final String JSON_TODAY_MONTH = "todayMonth";
-    public static final String JSON_TODAY_YEAR = "todayYear";
-    public static final String JSON_TODAY_MULLIS = "todayMullis";
+    private static final String JSON_TIME = "time";
+    private static final String JSON_DESCRIPTION = "description";
 
-    long mTaskDateMillis;
-    String mDescription;
-    Calendar c;
+    private long mTaskDateMillis;
+    private String mDescription;
+    private Calendar c;
 
     public TaskExample (long dateMillis, String description) {
         this.mTaskDateMillis = dateMillis;

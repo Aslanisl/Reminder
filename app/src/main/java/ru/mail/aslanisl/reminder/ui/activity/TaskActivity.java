@@ -7,8 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,12 +34,13 @@ import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 public class TaskActivity extends AppCompatActivity implements View.OnClickListener{
 
-    @BindView(R.id.data_task_linearLayout) LinearLayout mDataLayout;
-    @BindView(R.id.data_task_textView) TextView mDateTextView;
-    @BindView(R.id.time_task_linearLayout) LinearLayout mTimeLayout;
-    @BindView(R.id.time_task_textView) TextView mTimeTextView;
-    @BindView(R.id.task_create_button) Button mTaskCreateButton;
-    @BindView(R.id.description_task_editText) EditText mDescriptionEditText;
+    @BindView(R.id.task_activity_tool_bar) Toolbar mToolbar;
+    @BindView(R.id.task_activity_data_task_layout) LinearLayout mDataLayout;
+    @BindView(R.id.task_activity_data_task_text) TextView mDateTextView;
+    @BindView(R.id.task_activity_time_task_layout) LinearLayout mTimeLayout;
+    @BindView(R.id.task_activity_time_task_text) TextView mTimeTextView;
+    @BindView(R.id.task_activity_task_create_button) Button mTaskCreateButton;
+    @BindView(R.id.task_activity_description_task_editText) EditText mDescriptionEditText;
 
     private DatePickerFragment mNewDateFragment;
     private TimePickerFragment mNewTimeFragment;
@@ -67,21 +70,32 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         if (intent == null) {
             setCurrentDateTime();
+            mToolbar.setTitle(getString(R.string.new_task_title));
         } else {
             setTaskForEdit(intent);
+            mToolbar.setTitle(getString(R.string.edit_task_title));
         }
+
+        mToolbar.setNavigationIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white_24dp));
+        setSupportActionBar(mToolbar);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.data_task_linearLayout:
+            case R.id.task_activity_data_task_layout:
                 mNewDateFragment.show(getSupportFragmentManager(), "datePicker");
                 break;
-            case R.id.time_task_linearLayout:
+            case R.id.task_activity_time_task_layout:
                 mNewTimeFragment.show(getSupportFragmentManager(), "timePicker");
                 break;
-            case R.id.task_create_button:
+            case R.id.task_activity_task_create_button:
                 createTask();
                 break;
         }
@@ -167,6 +181,7 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
         Intent notificationIntent = new Intent(this, NotificationPublisher.class);
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, 1);
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
@@ -199,5 +214,4 @@ public class TaskActivity extends AppCompatActivity implements View.OnClickListe
 
         return builder.build();
     }
-
 }

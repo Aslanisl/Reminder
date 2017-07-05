@@ -2,7 +2,6 @@ package ru.mail.aslanisl.reminder.ui.adapter;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,30 +21,37 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.mail.aslanisl.reminder.R;
 import ru.mail.aslanisl.reminder.model.TaskExample;
-import ru.mail.aslanisl.reminder.ui.fragment.ActionTaskFragment;
 
 
 public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.ViewHolder> {
 
     private static final int SECTION_TYPE = 0;
     private static final int TASK_TYPE = 1;
-    private static final String SECTION_SOON = "Скоро";
-    private static final String SECTION_TODAY = "Сегодня";
-    private static final String SECTION_DONE= "Завершенные";
 
     private ArrayList<TaskExample> mTasks = new ArrayList<>();
     private SparseArray<Section> mSections = new SparseArray<>();
-    private Context mContext;
-    private FragmentManager mFragmentManager;
 
-    public TasksArrayAdapter(Context context, FragmentManager fragmentManager) {
+    private static RecyclerItemLongListener sRecyclerItemLongListener;
+    private static RecyclerItemListener sRecyclerItemListener;
+
+    private Context mContext;
+
+    public interface RecyclerItemLongListener {
+        void onTaskLongClick(int position);
+    }
+
+    public interface RecyclerItemListener {
+        void onTaskClick(int position);
+    }
+
+    public TasksArrayAdapter(Context context, RecyclerItemLongListener recyclerItemLongListener, RecyclerItemListener recyclerItemListener) {
         mContext = context;
-        mFragmentManager = fragmentManager;
+        sRecyclerItemLongListener = recyclerItemLongListener;
+        sRecyclerItemListener = recyclerItemListener;
     }
 
     @Override
     public TasksArrayAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         if (viewType == TASK_TYPE){
             View taskView = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
             return new ViewHolder(taskView);
@@ -58,7 +63,6 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     @Override
     public void onBindViewHolder(TasksArrayAdapter.ViewHolder holder, int position) {
-
         if (isSectionHeaderPosition(holder.getAdapterPosition())){
             holder.mSectionTextView.setText(String.valueOf(mSections.get(position).getTitle()));
         } else {
@@ -76,8 +80,15 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
             holder.mMainContainer.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    ActionTaskFragment.newInstance(taskPosition).show(mFragmentManager, "ActionTask");
+                    sRecyclerItemLongListener.onTaskLongClick(taskPosition);
                     return true;
+                }
+            });
+
+            holder.mMainContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sRecyclerItemListener.onTaskClick(taskPosition);
                 }
             });
         }
@@ -85,38 +96,33 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     public void addTasks(ArrayList<TaskExample> taskList) {
         mTasks.clear();
-        mTasks.addAll(taskList);
-        Collections.sort(mTasks, new Comparator<TaskExample>() {
-            @Override
-            public int compare(TaskExample o1, TaskExample o2) {
-                return String.valueOf(o2.getTaskDateMillis()).compareTo(String.valueOf(o1.getTaskDateMillis()));
-            }
-        });
+        if (taskList != null) {
+            mTasks.addAll(taskList);
+            Collections.sort(mTasks, new Comparator<TaskExample>() {
+                @Override
+                public int compare(TaskExample o1, TaskExample o2) {
+                    return String.valueOf(o2.getTaskDateMillis()).compareTo(String.valueOf(o1.getTaskDateMillis()));
+                }
+            });
 
-        sortingTasksToSections(mTasks);
-
-        notifyDataSetChanged();
+            sortingTasksToSections(mTasks);
+            notifyDataSetChanged();
+        }
     }
 
     public void addNewTask (TaskExample taskExample){
         int newTaskPosition = 0;
-
         for (TaskExample task : mTasks){
             if (task.getTaskDateMillis() > taskExample.getTaskDateMillis()) newTaskPosition++;
         }
-
         mTasks.add(newTaskPosition, taskExample);
-
-        sortingTasksToSections(mTasks);
-
         notifyDataSetChanged();
     }
 
     public void removeTask (int position){
         if (position < getItemCount()) {
             mTasks.remove(sectionedPositionToPosition(position));
-            sortingTasksToSections(mTasks);
-            notifyDataSetChanged();
+            notifyItemRemoved(position);
         }
     }
 
@@ -128,7 +134,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         }
     }
 
-    public void sortingTasksToSections (ArrayList<TaskExample> tasks){
+    private void sortingTasksToSections (ArrayList<TaskExample> tasks){
 
         int soonTasks = 0;
         boolean isHasSoonTask = false;
@@ -136,9 +142,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         boolean isHasTodayTask = false;
         int doneTasks = 0;
         boolean isHasDoneTask = false;
-
         Calendar calendar = Calendar.getInstance();
-
         for (TaskExample task : tasks){
             if (task.getTaskDateMillis() < calendar.getTimeInMillis()){
                 doneTasks++;
@@ -154,18 +158,11 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
                 isHasSoonTask = true;
             }
         }
-
         List<Section> sections = new ArrayList<Section>();
         sections.clear();
-
-        if (isHasSoonTask)
-            sections.add(new Section(0, SECTION_SOON));
-
-        if (isHasTodayTask)
-            sections.add(new Section(soonTasks, SECTION_TODAY));
-
-        if (isHasDoneTask)
-            sections.add(new Section(todayTasks + soonTasks, SECTION_DONE));
+        if (isHasSoonTask) sections.add(new Section(0, mContext.getString(R.string.soon)));
+        if (isHasTodayTask) sections.add(new Section(soonTasks, mContext.getString(R.string.today)));
+        if (isHasDoneTask) sections.add(new Section(todayTasks + soonTasks, mContext.getString(R.string.done)));
 
         mSections.clear();
 
@@ -199,27 +196,27 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         return mTasks;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         @Nullable @BindView(R.id.task_item_container) CardView mMainContainer;
-        @Nullable @BindView(R.id.data_textView) TextView mDataTextView;
-        @Nullable @BindView(R.id.time_textView) TextView mTimeTextView;
-        @Nullable @BindView(R.id.description_textView) TextView mDescriptionTextView;
+        @Nullable @BindView(R.id.data_text_view) TextView mDataTextView;
+        @Nullable @BindView(R.id.time_text_view) TextView mTimeTextView;
+        @Nullable @BindView(R.id.description_text_view) TextView mDescriptionTextView;
         @Nullable @BindView(R.id.section_text) TextView mSectionTextView;
 
-        public ViewHolder(View itemView) {
+        private ViewHolder(View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
         }
     }
 
-    public static class Section {
+    private static class Section {
         int mFirstPosition;
         int mSectionedPosition;
         String mTitle;
 
-        public Section(int firstPosition, String title) {
+        private Section(int firstPosition, String title) {
             this.mFirstPosition = firstPosition;
             this.mTitle = title;
         }
@@ -255,8 +252,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         return sectionedPosition + offset;
     }
 
-    public boolean isSectionHeaderPosition(int position) {
+    private boolean isSectionHeaderPosition(int position) {
         return mSections.get(position) != null;
     }
-
 }

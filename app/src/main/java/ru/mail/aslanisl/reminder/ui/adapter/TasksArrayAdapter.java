@@ -52,7 +52,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     @Override
     public TasksArrayAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == TASK_TYPE){
+        if (viewType == TASK_TYPE) {
             View taskView = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
             return new ViewHolder(taskView);
         } else {
@@ -63,15 +63,16 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
 
     @Override
     public void onBindViewHolder(TasksArrayAdapter.ViewHolder holder, int position) {
-        if (isSectionHeaderPosition(holder.getAdapterPosition())){
+        if (isSectionHeaderPosition(holder.getAdapterPosition())) {
             holder.mSectionTextView.setText(String.valueOf(mSections.get(position).getTitle()));
         } else {
-            final int taskPosition =  sectionedPositionToPosition(holder.getAdapterPosition());
+            final int taskPosition = sectionedPositionToPosition(holder.getAdapterPosition());
 
             holder.mDataTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getDay()) + ":"
                     + String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getMonth() + 1) + ":"
                     + String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getYear()));
 
+            holder.mTitleTextView.setText(mTasks.get(taskPosition).getTitle());
             holder.mDescriptionTextView.setText(mTasks.get(taskPosition).getDescription());
 
             holder.mTimeTextView.setText(String.format(Locale.ENGLISH, "%02d", mTasks.get(taskPosition).getHour()) + ":"
@@ -110,23 +111,27 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         }
     }
 
-    public void addNewTask (TaskExample taskExample){
-        int newTaskPosition = 0;
-        for (TaskExample task : mTasks){
-            if (task.getTaskDateMillis() > taskExample.getTaskDateMillis()) newTaskPosition++;
+    public void addNewTask(TaskExample taskExample) {
+        int newPosition = 0;
+        for (TaskExample task : mTasks) {
+            if (taskExample.getTaskDateMillis() < task.getTaskDateMillis()) {
+                newPosition++;
+            }
         }
-        mTasks.add(newTaskPosition, taskExample);
+        mTasks.add(newPosition, taskExample);
+        sortingTasksToSections(mTasks);
         notifyDataSetChanged();
     }
 
-    public void removeTask (int position){
+    public void removeTask(int position) {
         if (position < getItemCount()) {
-            mTasks.remove(sectionedPositionToPosition(position));
-            notifyItemRemoved(position);
+            mTasks.remove(position);
+            sortingTasksToSections(mTasks);
+            notifyDataSetChanged();
         }
     }
 
-    public void editTask (int position, TaskExample taskExample){
+    public void editTask(int position, TaskExample taskExample) {
         if (position < getItemCount()) {
             mTasks.set(position, taskExample);
             sortingTasksToSections(mTasks);
@@ -134,7 +139,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         }
     }
 
-    private void sortingTasksToSections (ArrayList<TaskExample> tasks){
+    private void sortingTasksToSections(ArrayList<TaskExample> tasks) {
 
         int soonTasks = 0;
         boolean isHasSoonTask = false;
@@ -143,13 +148,13 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         int doneTasks = 0;
         boolean isHasDoneTask = false;
         Calendar calendar = Calendar.getInstance();
-        for (TaskExample task : tasks){
-            if (task.getTaskDateMillis() < calendar.getTimeInMillis()){
+        for (TaskExample task : tasks) {
+            if (task.getTaskDateMillis() < calendar.getTimeInMillis()) {
                 doneTasks++;
                 isHasDoneTask = true;
             } else if (task.getDay() == calendar.get(Calendar.DAY_OF_MONTH)
                     && task.getMonth() == calendar.get(Calendar.MONTH)
-                    && task.getYear() == calendar.get(Calendar.YEAR)){
+                    && task.getYear() == calendar.get(Calendar.YEAR)) {
 
                 todayTasks++;
                 isHasTodayTask = true;
@@ -165,7 +170,6 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         if (isHasDoneTask) sections.add(new Section(todayTasks + soonTasks, mContext.getString(R.string.done)));
 
         mSections.clear();
-
         int offset = 0; // offset positions for the headers we're adding
         for (Section section : sections) {
             section.mSectionedPosition = section.mFirstPosition + offset;
@@ -192,7 +196,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
                 : getItemId(sectionedPositionToPosition(position));
     }
 
-    public ArrayList<TaskExample> getTasks (){
+    public ArrayList<TaskExample> getTasks() {
         return mTasks;
     }
 
@@ -201,6 +205,7 @@ public class TasksArrayAdapter extends RecyclerView.Adapter<TasksArrayAdapter.Vi
         @Nullable @BindView(R.id.task_item_container) CardView mMainContainer;
         @Nullable @BindView(R.id.data_text_view) TextView mDataTextView;
         @Nullable @BindView(R.id.time_text_view) TextView mTimeTextView;
+        @Nullable @BindView(R.id.title_text_view) TextView mTitleTextView;
         @Nullable @BindView(R.id.description_text_view) TextView mDescriptionTextView;
         @Nullable @BindView(R.id.section_text) TextView mSectionTextView;
 

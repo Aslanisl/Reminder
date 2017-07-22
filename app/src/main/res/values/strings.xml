@@ -2,6 +2,7 @@
     <string name="app_name">Reminder</string>
     <string name="action_settings">Settings</string>
     <string name="main_title">Напоминалка</string>
+    <string name="title">Заголовок</string>
     <string name="description">Описание</string>
     <string name="date">Дата</string>
     <string name="time">Время</string>
@@ -19,4 +20,6 @@
     <string name="new_task_title">Новое напоминание</string>
     <string name="edit_task_title">Редактировать напоминание</string>
 
+    <string name="need_to_do">Необходимо сделать: </string>
+    <string name="save_task">Сохранить</string>
 </resources>

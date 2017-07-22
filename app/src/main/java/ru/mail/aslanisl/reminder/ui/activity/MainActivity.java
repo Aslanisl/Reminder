@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +19,11 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
+
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 
 import java.util.ArrayList;
 
@@ -31,10 +36,11 @@ import ru.mail.aslanisl.reminder.model.TaskExample;
 import ru.mail.aslanisl.reminder.utils.TaskIntentJSONSerializer;
 import ru.mail.aslanisl.reminder.ui.adapter.TasksArrayAdapter;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+
 public class MainActivity extends AppCompatActivity implements TasksArrayAdapter.RecyclerItemLongListener, TasksArrayAdapter.RecyclerItemListener {
 
     public static final String TAG = "myLogs";
-    private static final String TASK_LIST_FILENAME = "taskslist.json";
     public static final int TASK_REQUEST_CODE = 1;
     public static final int TASK_EDIT_REQUEST_CODE = 2;
     public static final int DEFAULT_VALUE = 1;
@@ -43,7 +49,8 @@ public class MainActivity extends AppCompatActivity implements TasksArrayAdapter
     @BindView(R.id.main_activity_tasks_recycler) RecyclerView mTasksRecycleView;
     @BindView(R.id.main_activity_no_tasks) TextView mEmptyTask;
 
-    private TaskIntentJSONSerializer mSerializer;
+    private Drawer mDrawer;
+
     private TasksSingleton mTasksSingleton;
     private TasksArrayAdapter mTasksAdapter;
     private Paint p = new Paint();
@@ -55,26 +62,38 @@ public class MainActivity extends AppCompatActivity implements TasksArrayAdapter
 
         ButterKnife.bind(this);
 
-        mSerializer = new TaskIntentJSONSerializer(getApplicationContext(), TASK_LIST_FILENAME);
         mToolBar.setTitle(getString(R.string.main_title));
         setSupportActionBar(mToolBar);
         mToolBar.setTitleTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorWhite));
+        mToolBar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawer.openDrawer();
+            }
+        });
+
+        initDrawer();
 
         mTasksRecycleView.setLayoutManager(new LinearLayoutManager(this));
         mTasksAdapter = new TasksArrayAdapter(getApplicationContext(), this, this);
-        //Apply this adapter to the RecyclerView
         mTasksRecycleView.setAdapter(mTasksAdapter);
 
 //        initItemTouchHelper(mTasksRecycleView);
 
         mTasksSingleton = TasksSingleton.getInstance();
         mTasksAdapter.addTasks(mTasksSingleton.getTasks());
-
         if (mTasksAdapter.getItemCount() == 0) {
             mEmptyTask.setVisibility(View.VISIBLE);
         } else {
             mEmptyTask.setVisibility(View.GONE);
         }
+    }
+
+    private void initDrawer(){
+        mDrawer = new DrawerBuilder()
+                .withActivity(this)
+                .build();
     }
 
     @OnClick(R.id.main_activity_new_task)
@@ -89,14 +108,18 @@ public class MainActivity extends AppCompatActivity implements TasksArrayAdapter
         if (requestCode == TASK_REQUEST_CODE && resultCode == RESULT_OK) {
             boolean isEditTask = data.getBooleanExtra("edit", false);
             mEmptyTask.setVisibility(View.GONE);
+            long timeMillis = data.getLongExtra("date", DEFAULT_VALUE);
+            String mTitle = data.getStringExtra("title");
+            String mDescription = data.getStringExtra("description");
+            TaskExample taskExample = new TaskExample(timeMillis, mTitle, mDescription);
             if (isEditTask) {
-                TaskExample taskExample = new TaskExample(data.getLongExtra("date", DEFAULT_VALUE),
-                        data.getStringExtra("description"));
                 int position = data.getIntExtra("position", 0);
                 mTasksAdapter.editTask(position, taskExample);
-            } else
-                mTasksAdapter.addNewTask(new TaskExample(data.getLongExtra("date", DEFAULT_VALUE),
-                        data.getStringExtra("description")));
+                mTasksSingleton.editTest(position, taskExample);
+            } else {
+                mTasksAdapter.addNewTask(taskExample);
+                mTasksSingleton.addTask(taskExample);
+            }
         } else if (requestCode == TASK_EDIT_REQUEST_CODE && resultCode == RESULT_OK){
 
         }
@@ -132,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements TasksArrayAdapter
     }
 
     public void deleteTask(int position) {
+        Toast.makeText(this, String.valueOf(position), Toast.LENGTH_SHORT).show();
         mTasksAdapter.removeTask(position);
+        mTasksSingleton.removeTask(position);
     }
 
     //Добавить обрабоку свайпов для ресайклера
@@ -189,7 +214,34 @@ public class MainActivity extends AppCompatActivity implements TasksArrayAdapter
 
     @Override
     public void onTaskLongClick(int position) {
+        createAlertDialog(position);
+    }
 
+    private void createAlertDialog(final int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(R.layout.alert_dialog_task);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        TextView editText = (TextView)dialog.findViewById(R.id.alert_dialog_edit_task);
+        if (editText != null) {
+            editText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editTask(position);
+                    dialog.dismiss();
+                }
+            });
+        }
+        TextView deleteText = (TextView)dialog.findViewById(R.id.alert_dialog_delete_task);
+        if (deleteText != null) {
+            deleteText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteTask(position);
+                    dialog.dismiss();
+                }
+            });
+        }
     }
 
     @Override

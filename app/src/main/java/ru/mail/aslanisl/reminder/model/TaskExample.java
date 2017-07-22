@@ -9,14 +9,17 @@ import java.util.Calendar;
 public class TaskExample implements Serializable{
 
     private static final String JSON_TIME = "time";
+    private static final String JSON_TITLE = "title";
     private static final String JSON_DESCRIPTION = "description";
 
     private long mTaskDateMillis;
+    private String mTitle;
     private String mDescription;
     private Calendar c;
 
-    public TaskExample (long dateMillis, String description) {
+    public TaskExample (long dateMillis, String title, String description) {
         this.mTaskDateMillis = dateMillis;
+        this.mTitle = title;
         this.mDescription = description;
         c = Calendar.getInstance();
         c.setTimeInMillis(dateMillis);
@@ -24,6 +27,7 @@ public class TaskExample implements Serializable{
 
     public TaskExample (JSONObject json) throws JSONException{
         mTaskDateMillis = json.getLong(JSON_TIME);
+        mTitle = json.getString(JSON_TITLE);
         mDescription = json.getString(JSON_DESCRIPTION);
         c = Calendar.getInstance();
         c.setTimeInMillis(mTaskDateMillis);
@@ -32,6 +36,7 @@ public class TaskExample implements Serializable{
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
         json.put(JSON_TIME, mTaskDateMillis);
+        json.put(JSON_TITLE, mTitle);
         json.put(JSON_DESCRIPTION, mDescription);
         return json;
     }
@@ -58,6 +63,10 @@ public class TaskExample implements Serializable{
 
     public long getTaskDateMillis() {
         return mTaskDateMillis;
+    }
+
+    public String getTitle() {
+        return mTitle;
     }
 
     public String getDescription() {
